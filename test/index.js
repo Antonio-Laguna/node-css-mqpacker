@@ -118,8 +118,10 @@ exports["Real CSS"] = test => {
       opts.sort = true;
     }
 
+    const result = mqpacker.pack(readInput(testCase), opts).css;
+
     test.strictEqual(
-      mqpacker.pack(readInput(testCase), opts).css,
+      result,
       readExpected(testCase),
       testCase
     );

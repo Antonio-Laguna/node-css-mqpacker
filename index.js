@@ -11,11 +11,7 @@ const isSourceMapAnnotation = rule => {
     return false;
   }
 
-  if (rule.text.toLowerCase().indexOf("# sourcemappingurl=") !== 0) {
-    return false;
-  }
-
-  return true;
+  return rule.text.toLowerCase().indexOf("# sourcemappingurl=") === 0;
 };
 
 const parseQueryList = queryList => {
@@ -160,11 +156,8 @@ module.exports = postcss.plugin(pkg.name, options => {
           params: atRule.parent.params
         });
 
-        atRule.each(rule => {
-          newAtRule.append(rule);
-        });
+        atRule.each(rule => newAtRule.append(rule));
         atRule.remove();
-        atRule.removeAll();
         atRule.append(newAtRule);
       }
 
@@ -172,9 +165,7 @@ module.exports = postcss.plugin(pkg.name, options => {
       const past = queries[queryList];
 
       if (typeof past === "object") {
-        atRule.each(rule => {
-          past.append(rule.clone());
-        });
+        atRule.each(rule => past.append(rule));
       } else {
         queries[queryList] = atRule.clone();
         queryLists.push(queryList);
