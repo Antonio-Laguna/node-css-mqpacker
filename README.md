@@ -11,52 +11,59 @@ A well componentized CSS file may have same media queries that can merge:
 
 ```css
 .foo {
-  width: 240px;
+	width: 240px;
 }
 
 @media screen and (min-width: 768px) {
-  .foo {
-    width: 576px;
-  }
+	.foo {
+		width: 576px;
+	}
 }
 
 .bar {
-  width: 160px;
+	width: 160px;
 }
 
 @media screen and (min-width: 768px) {
-  .bar {
-    width: 384px;
-  }
+	.bar {
+		width: 384px;
+	}
 }
 ```
 
-This PostCSS plugin packs exactly same media queries:
+This tool packs exactly same media queries:
 
 ```css
 .foo {
-  width: 240px;
+	width: 240px;
 }
 
 .bar {
-  width: 160px;
+	width: 160px;
 }
 
 @media screen and (min-width: 768px) {
-  .foo {
-    width: 576px;
-  }
-  .bar {
-    width: 384px;
-  }
+	.foo {
+		width: 576px;
+	}
+	.bar {
+		width: 384px;
+	}
 }
 ```
-
 
 INSTALL
 -------
 
-    $ npm install css-mqpacker
+    $ echo @hail2u:registry=https://npm.pkg.github.com >> .npmrc
+    $ npm install --save-dev @hail2u/css-mqpacker
+
+If you or your team member does not have GitHub account, you can install
+directly from the GitHub repository:
+
+    $ npm install --save-dev github:hail2u/node-css-mqpacker#<TAG>
+
+`<TAG>` should be replaced with one of the [available tags][1].
 
 
 USAGE
@@ -65,18 +72,13 @@ USAGE
 Of course, this package can be used as PostCSS plugin:
 
 ```javascript
-#!/usr/bin/env node
-
-"use strict";
-
 const fs = require("fs");
 const postcss = require("postcss");
 
 postcss([
-  require("autoprefixer-core")(),
-  require("css-mqpacker")()
+	require("@hail2u/css-mqpacker")()
 ]).process(fs.readFileSync("from.css", "utf8")).then(function (result) {
-  console.log(result.css);
+	console.log(result.css);
 });
 ```
 
@@ -89,19 +91,15 @@ This package is also a Node.js module. For example, you can read `from.css`,
 process its content, and output processed CSS to STDOUT:
 
 ```javascript
-#!/usr/bin/env node
-
-"use strict";
-
 const fs = require("fs");
-const mqpacker = require("css-mqpacker");
+const mqpacker = require("@hail2u/css-mqpacker");
 
 console.log(mqpacker.pack(fs.readFileSync("from.css", "utf8"), {
-  from: "from.css",
-  map: {
-    inline: false
-  },
-  to: "to.css"
+	from: "from.css",
+	map: {
+		inline: false
+	},
+	to: "to.css"
 }).css);
 ```
 
@@ -109,6 +107,7 @@ console.log(mqpacker.pack(fs.readFileSync("from.css", "utf8"), {
 ### As CLI Program
 
 This package also installs a command line interface.
+
 
     $ node ./node_modules/.bin/mqpacker --help
     Usage: mqpacker [options] INPUT [OUTPUT]
@@ -133,9 +132,6 @@ format instead of Node.js stack trace.
 
 The `--sort` option does not currently support a custom function.
 
-If you install this package in global, CLI will be available somewhere in the
-`$PATH`.
-
 
 OPTIONS
 -------
@@ -143,14 +139,14 @@ OPTIONS
 ### sort
 
 By default, CSS MQPacker pack and order media queries as they are defined ([the
-“first win” algorithm][1]). If you want to sort media queries automatically,
+“first win” algorithm][2]). If you want to sort media queries automatically,
 pass `sort: true` to this module.
 
 ```javascript
 postcss([
-  mqpacker({
-    sort: true
-  })
+	mqpacker({
+		sort: true
+	})
 ]).process(css);
 ```
 
@@ -160,11 +156,11 @@ your own sorting function and pass it to this module like this:
 
 ```javascript
 postcss([
-  mqpacker({
-    sort: function (a, b) {
-      return a.localeCompare(b);
-    }
-  })
+	mqpacker({
+		sort: function (a, b) {
+			return a.localeCompare(b);
+		}
+	})
 ]).process(css);
 ```
 
@@ -177,28 +173,28 @@ all your media queries.
 API
 ---
 
-### pack(css, [options])
+### pack(css[, options])
 
 Packs media queries in `css`.
 
 The second argument is optional. The `options` are:
 
-- [options][2] mentioned above
-- the second argument of [PostCSS’s `process()` method][3]
+- [options][3] mentioned above
+- the second argument of [PostCSS’s `process()` method][4]
 
 You can specify both at the same time.
 
 ```javascript
 const fs = require("fs");
-const mqpacker = require("css-mqpacker");
+const mqpacker = require("@hail2u/css-mqpacker");
 
 const result = mqpacker.pack(fs.readFileSync("from.css", "utf8"), {
-  from: "from.css",
-  map: {
-    inline: false
-  },
-  sort: true,
-  to: "to.css"
+	from: "from.css",
+	map: {
+		inline: false
+	},
+	sort: true,
+	to: "to.css"
 });
 fs.writeFileSync("to.css", result.css);
 fs.writeFileSync("to.css.map", result.map);
@@ -220,13 +216,13 @@ unexpected cascading order. For example:
 
 ```css
 @media (min-width: 640px) {
-  .foo {
-    width: 300px;
-  }
+	.foo {
+		width: 300px;
+	}
 }
 
 .foo {
-  width: 400px;
+	width: 400px;
 }
 ```
 
@@ -234,13 +230,13 @@ Becomes:
 
 ```css
 .foo {
-  width: 400px;
+	width: 400px;
 }
 
 @media (min-width: 640px) {
-  .foo {
-    width: 300px;
-  }
+	.foo {
+		width: 300px;
+	}
 }
 ```
 
@@ -260,29 +256,29 @@ CSS MQPacker is implemented with the “first win” algorithm. This means:
 
 ```css
 .foo {
-  width: 10px;
+	width: 10px;
 }
 
 @media (min-width: 640px) {
-  .foo {
-    width: 150px;
-  }
+	.foo {
+		width: 150px;
+	}
 }
 
 .bar {
-  width: 20px;
+	width: 20px;
 }
 
 @media (min-width: 320px) {
-  .bar {
-    width: 200px;
-  }
+	.bar {
+		width: 200px;
+	}
 }
 
 @media (min-width: 640px) {
-  .bar {
-    width: 300px;
-  }
+	.bar {
+		width: 300px;
+	}
 }
 ```
 
@@ -290,26 +286,26 @@ Becomes:
 
 ```css
 .foo {
-  width: 10px;
+	width: 10px;
 }
 
 .bar {
-  width: 20px;
+	width: 20px;
 }
 
 @media (min-width: 640px) {
-  .foo {
-    width: 150px;
-  }
-  .bar {
-    width: 300px;
-  }
+	.foo {
+		width: 150px;
+	}
+	.bar {
+		width: 300px;
+	}
 }
 
 @media (min-width: 320px) {
-  .bar {
-    width: 200px;
-  }
+	.bar {
+		width: 200px;
+	}
 }
 ```
 
@@ -323,7 +319,7 @@ I suggest defining a query order on top of your CSS:
 @media (min-width: 640px) { /* Wider than 640px */ }
 ```
 
-If you use simple `min-width` queries only, [the `sort` option][4] can help.
+If you use simple `min-width` queries only, [the `sort` option][5] can help.
 
 
 ### Multiple Classes
@@ -333,21 +329,21 @@ elements that have multiple classes. For example:
 
 ```css
 @media (min-width: 320px) {
-  .foo {
-    width: 100px;
-  }
+	.foo {
+		width: 100px;
+	}
 }
 
 @media (min-width: 640px) {
-  .bar {
-    width: 200px;
-  }
+	.bar {
+		width: 200px;
+	}
 }
 
 @media (min-width: 320px) {
-  .baz {
-    width: 300px;
-  }
+	.baz {
+		width: 300px;
+	}
 }
 ```
 
@@ -355,18 +351,18 @@ Becomes:
 
 ```css
 @media (min-width: 320px) {
-  .foo {
-    width: 100px;
-  }
-  .baz {
-    width: 300px;
-  }
+	.foo {
+		width: 100px;
+	}
+	.baz {
+		width: 300px;
+	}
 }
 
 @media (min-width: 640px) {
-  .bar {
-    width: 200px;
-  }
+	.bar {
+		width: 200px;
+	}
 }
 ```
 
@@ -379,10 +375,11 @@ careful!
 LICENSE
 -------
 
-MIT: http://hail2u.mit-license.org/2014
+MIT
 
 
-[1]: #the-first-win-algorithm
-[2]: #options
-[3]: http://api.postcss.org/global.html#processOptions
-[4]: #sort
+[1]: https://github.com/hail2u/node-css-mqpacker/tags
+[2]: #the-first-win-algorithm
+[3]: #options
+[4]: http://api.postcss.org/global.html#processOptions
+[5]: #sort

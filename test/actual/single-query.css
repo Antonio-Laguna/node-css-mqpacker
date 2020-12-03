@@ -2,8 +2,20 @@
 	z-index: 1;
 }
 
+@media (min-width: 999px) {
+	.foo {
+		z-index: 4;
+	}
+}
+
 .bar {
 	z-index: 2;
+}
+
+@media (min-width: 999px) {
+	.bar {
+		z-index: 5;
+	}
 }
 
 .baz {
@@ -11,12 +23,6 @@
 }
 
 @media (min-width: 999px) {
-	.foo {
-		z-index: 4;
-	}
-	.bar {
-		z-index: 5;
-	}
 	.baz {
 		z-index: 6;
 	}

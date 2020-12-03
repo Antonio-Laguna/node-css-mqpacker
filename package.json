@@ -1,35 +1,34 @@
 {
-  "name": "css-mqpacker",
-  "description": "Pack same CSS media query rules into one using PostCSS",
-  "version": "7.0.0",
-  "author": "Kyo Nagashima <hail2u@gmail.com> (https://kyonagashima.com/)",
-  "bin": {
-    "mqpacker": "./bin/mqpacker.js"
-  },
-  "bugs": {
-    "url": "https://github.com/hail2u/node-css-mqpacker/issues"
-  },
-  "dependencies": {
-    "minimist": "^1.2.0",
-    "postcss": "^7.0.0"
-  },
-  "devDependencies": {
-    "nodeunit": "^0.11.3"
-  },
-  "homepage": "https://github.com/hail2u/node-css-mqpacker",
-  "keywords": [
-    "css",
-    "media",
-    "postcss-plugin",
-    "query"
-  ],
-  "license": "MIT",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hail2u/node-css-mqpacker.git"
-  },
-  "scripts": {
-    "test": "nodeunit test"
-  }
+	"name": "@hail2u/css-mqpacker",
+	"version": "8.0.1",
+	"description": "Pack same CSS media query rules into one using PostCSS",
+	"homepage": "https://github.com/hail2u/node-css-mqpacker",
+	"bugs": {
+		"url": "https://github.com/hail2u/node-css-mqpacker/issues"
+	},
+	"license": "MIT",
+	"author": "Kyo Nagashima <hail2u@gmail.com> (https://hail2u.net/)",
+	"files": [],
+	"main": "index.js",
+	"bin": {
+		"mqpacker": "./bin/mqpacker.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/hail2u/node-css-mqpacker.git"
+	},
+	"scripts": {
+		"test": "eslint index.js test/index.js && tape \"test/**/*.js\""
+	},
+	"dependencies": {
+		"minimist": "^1.2.5",
+		"postcss": "^7.0.32"
+	},
+	"devDependencies": {
+		"eslint": "^7.2.0",
+		"tape": "^5.0.1"
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com/"
+	}
 }

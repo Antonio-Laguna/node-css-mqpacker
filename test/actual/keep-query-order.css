@@ -6,13 +6,16 @@
 	.foo {
 		z-index: 1;
 	}
-	.bar {
-		z-index: 2;
-	}
 }
 
 @media (min-width: 999px) {
 	.foo {
 		z-index: 3;
+	}
+}
+
+@media (min-width: 99px) {
+	.bar {
+		z-index: 2;
 	}
 }

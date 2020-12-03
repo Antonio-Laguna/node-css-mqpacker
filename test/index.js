@@ -2,129 +2,98 @@ const fs = require("fs");
 const path = require("path");
 const postcss = require("postcss");
 const mqpacker = require("../index");
+const tape = require("tape");
 
-const doNothing = postcss.plugin("do-nothing", () => () => {});
-
-exports["Public API"] = test => {
-  const input = `.foo {
-  z-index: 0;
+tape("Loading test", (test) => {
+	const doNothing = postcss.plugin("do-nothing", () => () => "");
+	const input = `.foo {
+	z-index: 0;
 }
 
 @media (min-width:1px) {
-  .foo {
-    z-index: 1;
-  }
+	.foo {
+		z-index: 1;
+	}
 }
 `;
-  const expected = postcss(doNothing).process(input).css;
-  test.expect(2);
-  test.strictEqual(postcss([mqpacker()]).process(input).css, expected);
-  test.strictEqual(mqpacker.pack(input).css, expected);
-  test.done();
-};
+	const expected = postcss([doNothing]).process(input).css;
+	test.plan(2);
+	test.equal(postcss([mqpacker()]).process(input).css, expected);
+	test.equal(mqpacker.pack(input).css, expected);
+	test.end();
+});
 
-exports["Option: PostCSS options"] = test => {
-  const input = `.foo {
-  z-index: 0;
-}
-
-@media (min-width:1px) {
-  .foo {
-    z-index: 1;
-  }
-}
-
-/*# sourceMappingURL=from.css.map */
-`;
-  const opts = {
-    from: "from.css",
-    map: {
-      inline: false
-    }
-  };
-  const expected = postcss(doNothing).process(input, opts);
-  const processed = mqpacker.pack(input, opts);
-  test.expect(2);
-  test.strictEqual(processed.css, expected.css);
-  test.deepEqual(processed.map, expected.map);
-  test.done();
-};
-
-exports["Option: sort"] = test => {
-  const expected = `.foo {
-  z-index: 0;
+tape("`sort` option test", (test) => {
+	const expected = `.foo {
+	z-index: 0;
 }
 
 @media (min-width: 1px) {
-  .foo {
-    z-index: 1;
-  }
+	.foo {
+		z-index: 1;
+	}
 }
 
 @media (min-width: 2px) {
-  .foo {
-    z-index: 2;
-  }
+	.foo {
+		z-index: 2;
+	}
 }
 `;
-  const input = `.foo {
-  z-index: 0;
+	const input = `.foo {
+	z-index: 0;
 }
 
 @media (min-width: 2px) {
-  .foo {
-    z-index: 2;
-  }
+	.foo {
+		z-index: 2;
+	}
 }
 
 @media (min-width: 1px) {
-  .foo {
-    z-index: 1;
-  }
+	.foo {
+		z-index: 1;
+	}
 }
 `;
-  const opts = {
-    sort: true
-  };
-  test.expect(4);
-  test.notStrictEqual(mqpacker.pack(input).css, expected);
-  test.strictEqual(mqpacker.pack(input, opts).css, expected);
-  test.notStrictEqual(
-    postcss([mqpacker()]).process(input).css,
-    postcss([mqpacker(opts)]).process(input).css
-  );
-  test.strictEqual(
-    mqpacker.pack(input, {
-      sort: (c, d) => c.localeCompare(d)
-    }).css,
-    expected
-  );
-  test.done();
-};
+	const opts = {
+		sort: true
+	};
+	test.plan(4);
+	test.notEqual(mqpacker.pack(input).css, expected);
+	test.equal(mqpacker.pack(input, opts).css, expected);
+	test.notEqual(
+		postcss([mqpacker()]).process(input).css,
+		postcss([mqpacker(opts)]).process(input).css
+	);
+	test.equal(
+		postcss([mqpacker({
+			sort: (c, d) => c.localeCompare(d)
+		})]).process(input).css,
+		expected
+	);
+	test.end();
+});
 
-exports["Real CSS"] = test => {
-  const testCases = fs.readdirSync(path.join(__dirname, "fixtures"));
-  const readExpected = file =>
-    fs.readFileSync(path.join(__dirname, "expected", file), "utf8");
-  const readInput = file =>
-    fs.readFileSync(path.join(__dirname, "fixtures", file), "utf8");
-  test.expect(testCases.length);
-  testCases.forEach(testCase => {
-    const opts = {
-      sort: false
-    };
+tape("Real CSS files", (test) => {
+	const readActual = (file) => fs.readFileSync(path.join(__dirname, "actual", file), "utf8");
 
-    if (testCase.indexOf("sort_") === 0) {
-      opts.sort = true;
-    }
+	const readExpected = (file) => fs.readFileSync(path.join(__dirname, "expected", file), "utf8");
 
-    const result = mqpacker.pack(readInput(testCase), opts).css;
+	const testCases = fs.readdirSync(path.join(__dirname, "actual"));
+	test.plan(testCases.length);
+	testCases.forEach((testCase) => {
+		const opts = {};
 
-    test.strictEqual(
-      result,
-      readExpected(testCase),
-      testCase
-    );
-  });
-  test.done();
-};
+		if (testCase.startsWith("sort_")) {
+			opts.sort = true;
+		}
+
+		test.equal(
+			postcss([mqpacker(opts)]).process(readActual(testCase)).css,
+			readExpected(testCase),
+			testCase
+		);
+	});
+	test.end();
+});
